@@ -34,19 +34,19 @@ clap = { version = "4.5.37", features = ["derive", "string"] }
 clap-verbosity-flag = { version = "3.0.2", features = ["tracing"] }
 # TODO: use pixi_config crate
 pixi_config = { git = "https://github.com/prefix-dev/pixi", branch = "main" }
-rattler = { version = "0.33.5", default-features = false, features = [
+rattler = { version = "0.33.6", default-features = false, features = [
   "indicatif",
 ] }
-rattler_conda_types = "0.32.0"
-rattler_lock = "0.23.2"
-rattler_networking = { version = "0.22.12", default-features = false }
+rattler_conda_types = "0.33.0"
+rattler_lock = "0.23.3"
+rattler_networking = { version = "0.23.0", default-features = false }
 rattler_package_streaming = { version = "0.22.36", default-features = false }
 reqwest = { version = "0.12.15", default-features = false, features = [
   "http2",
   "macos-system-configuration",
 ] }
 reqwest-middleware = "0.4.2"
-tokio = { version = "1.44.2", features = ["rt-multi-thread"] }
+tokio = { version = "1.45.0", features = ["rt-multi-thread"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = [
   "default",
