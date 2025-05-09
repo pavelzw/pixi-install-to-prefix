@@ -116,11 +116,7 @@ async fn main() -> Result<()> {
         .with_download_client(download_client)
         .with_target_platform(cli.platform)
         .with_execute_link_scripts(true)
-        .with_reporter(
-            rattler::install::IndicatifReporter::builder()
-                // .with_multi_progress(global_multi_progress())
-                .finish(),
-        )
+        .with_reporter(rattler::install::IndicatifReporter::builder().finish())
         .install(&cli.prefix, packages)
         .await?;
 
