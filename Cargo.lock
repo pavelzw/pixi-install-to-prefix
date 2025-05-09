@@ -3282,6 +3282,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "url",
 ]
 
 [[package]]
@@ -3584,12 +3585,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b2e7bfacc5f5ff3517d984b5e2f2df3eea46e8309685cb7cdff39d62f7b2bee2"
 dependencies = [
  "anyhow",
+ "console",
  "digest",
  "dirs",
  "fs-err",
  "futures",
  "humantime",
  "indexmap 2.9.0",
+ "indicatif",
  "itertools 0.14.0",
  "memchr",
  "memmap2",

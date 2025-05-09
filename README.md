@@ -55,9 +55,20 @@ pixi exec pixi-install-to-prefix ./my-environment
 
 ## 🎯 Usage
 
-```bash
-pixi-install-to-prefix --help
-<TODO>
+```text
+Usage: pixi-install-to-prefix [OPTIONS] <PREFIX>
+
+Arguments:
+  <PREFIX>  The path to the prefix where you want to install the environment
+
+Options:
+  -l, --lockfile <LOCKFILE>        The path to the pixi lockfile [default: pixi.lock]
+  -e, --environment <ENVIRONMENT>  The name of the pixi environment to install [default: default]
+  -p, --platform <PLATFORM>        The platform you want to install for [default: osx-arm64]
+  -c, --config <CONFIG>            The path to the pixi config file. By default, no config file is used
+  -v, --verbose...                 Increase logging verbosity
+  -q, --quiet...                   Decrease logging verbosity
+  -h, --help                       Print help
 ```
 
 ### Mirror and S3 middleware
