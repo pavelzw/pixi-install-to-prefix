@@ -96,7 +96,9 @@ async fn main() -> Result<()> {
                     file_name: p.file_name.clone(),
                     url: match p.location.clone() {
                         UrlOrPath::Url(url) => url,
-                        UrlOrPath::Path(_) => Err(anyhow!("Path package {} is not supported", p.location))?,
+                        UrlOrPath::Path(_) => {
+                            Err(anyhow!("Path package {} is not supported", p.location))?
+                        }
                     },
                     channel: p.channel.clone().map(|c| c.to_string()),
                 }),
