@@ -39,7 +39,9 @@ rattler = { version = "0.33.6", default-features = false, features = [
 ] }
 rattler_conda_types = "0.33.0"
 rattler_lock = "0.23.3"
-rattler_networking = { version = "0.23.0", default-features = false }
+rattler_networking = { version = "0.23.0", default-features = false, features = [
+  "s3",
+] }
 rattler_package_streaming = { version = "0.22.36", default-features = false }
 reqwest = { version = "0.12.15", default-features = false, features = [
   "http2",
