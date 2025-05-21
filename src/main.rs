@@ -10,7 +10,7 @@ use rattler_conda_types::{Platform, RepoDataRecord};
 use rattler_lock::{
     CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackageRef, UrlOrPath,
 };
-use tokio::fs::read_to_string;
+use tokio::fs::{OpenOptions, read_to_string};
 
 /* -------------------------------------------- CLI -------------------------------------------- */
 
@@ -18,7 +18,7 @@ use tokio::fs::read_to_string;
 struct Cli {
     /// The path to the prefix where you want to install the environment.
     #[clap()]
-    prefix: String,
+    prefix: PathBuf,
 
     /// The path to the pixi lockfile.
     #[arg(short, long, default_value = "pixi.lock")]
@@ -41,6 +41,8 @@ struct Cli {
 }
 
 /* -------------------------------------------- MAIN ------------------------------------------- */
+
+const CONDA_HISTORY_FILE: &str = "conda-meta/history";
 
 /// The main entrypoint for the pixi-install-to-prefix CLI.
 #[tokio::main]
@@ -120,10 +122,19 @@ async fn main() -> Result<()> {
         .install(&cli.prefix, packages)
         .await?;
 
+    // hotfix: create history file, otherwise the prefix is rejected by conda
+    // TODO: can be removed with rattler-conda-types v0.33.0
+    OpenOptions::new()
+        .write(true)
+        .create(true)
+        .append(true)
+        .open(cli.prefix.join(CONDA_HISTORY_FILE))
+        .await?;
+
     eprintln!(
         "Installed {} packages to {}",
         result.transaction.operations.len(),
-        cli.prefix
+        cli.prefix.display()
     );
 
     tracing::debug!("Finished running pixi-install-to-prefix");

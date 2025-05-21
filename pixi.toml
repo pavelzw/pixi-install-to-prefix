@@ -21,6 +21,10 @@ rust = "==1.86.0"
 openssl = "3.*"
 pkg-config = "*"
 
+# for integration testing
+conda = "*"
+micromamba = "*"
+
 [target.linux.dependencies]
 compilers = ">=1.7.0"
 

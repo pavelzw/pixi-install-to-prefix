@@ -1,7 +1,7 @@
 [package]
 name = "pixi-install-to-prefix"
 description = "Install pixi environments to an arbitrary prefix"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 # See https://doc.rust-lang.org/cargo/reference/profiles.html
@@ -56,3 +56,5 @@ url = "2.5.4"
 
 [dev-dependencies]
 rstest = "0.25.0"
+assert_cmd = "2.0.17"
+tempfile = "3.20.0"
