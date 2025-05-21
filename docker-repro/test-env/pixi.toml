@@ -1,0 +1,10 @@
+[project]
+name = "docker-repro-test-env"
+channels = ["conda-forge"]
+platforms = ["linux-aarch64", "linux-64", "osx-arm64"]
+
+[dependencies]
+jupyterlab = "*"
+
+# commenting out jupyterlab and uncommenting numpy works weirdly
+#numpy = "*"
