@@ -123,7 +123,7 @@ async fn main() -> Result<()> {
         .await?;
 
     // hotfix: create history file, otherwise the prefix is rejected by conda
-    // can be removed with rattler-conda-types v0.33.0
+    // TODO: can be removed with rattler-conda-types v0.33.0
     OpenOptions::new()
         .write(true)
         .create(true)
