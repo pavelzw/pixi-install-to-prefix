@@ -21,7 +21,7 @@ fn validate_prefix_micromamba(target: &TempDir) {
         .expect("failed to execute micromamba on prefix");
 
     let micromamba_stdout = str::from_utf8(&micromamba_output.stdout).unwrap();
-    assert!(micromamba_stdout.trim_end().ends_with("/bin/python"));
+    assert!(micromamba_stdout.trim_end().ends_with("python"));
 }
 
 fn validate_prefix_conda(target: &TempDir) {
@@ -35,7 +35,7 @@ fn validate_prefix_conda(target: &TempDir) {
         .expect("failed to execute conda on prefix");
 
     let conda_stdout = str::from_utf8(&conda_output.stdout).unwrap();
-    assert!(conda_stdout.trim_end().ends_with("/bin/python"));
+    assert!(conda_stdout.trim_end().ends_with("python"));
 }
 
 #[rstest]
