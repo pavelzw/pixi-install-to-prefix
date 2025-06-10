@@ -1,5 +1,5 @@
 [project]
-name = "pixi-inject-to-prefix"
+name = "pixi-install-to-prefix"
 channels = ["conda-forge"]
 platforms = [
   "osx-arm64",

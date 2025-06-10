@@ -4,13 +4,14 @@ use anyhow::{Result, anyhow};
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 use pixi_config::Config;
-use pixi_install_to_prefix::reqwest_client_from_config;
+use pixi_install_to_prefix::{create_activation_scripts, reqwest_client_from_config};
 use rattler::install::Installer;
 use rattler_conda_types::{Platform, RepoDataRecord};
 use rattler_lock::{
     CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackageRef, UrlOrPath,
 };
-use tokio::fs::{OpenOptions, read_to_string};
+use rattler_shell::shell::{Bash, CmdExe, Fish, PowerShell, ShellEnum};
+use tokio::fs::{self, OpenOptions, read_to_string};
 
 /* -------------------------------------------- CLI -------------------------------------------- */
 
@@ -35,6 +36,14 @@ struct Cli {
     /// The path to the pixi config file. By default, no config file is used.
     #[arg(short, long)]
     config: Option<PathBuf>,
+
+    /// The shell(s) to generate activation scripts for. Default: see README.
+    #[arg(short, long)]
+    shell: Option<Vec<ShellEnum>>,
+
+    /// Disable the generation of activation scripts.
+    #[arg(long, conflicts_with = "shell")]
+    no_activation_scripts: bool,
 
     #[command(flatten)]
     verbose: Verbosity,
@@ -136,6 +145,22 @@ async fn main() -> Result<()> {
         result.transaction.operations.len(),
         cli.prefix.display()
     );
+
+    if !cli.no_activation_scripts {
+        let shells = cli.shell.unwrap_or_else(|| {
+            // Default shells based on the platform
+            match cli.platform {
+                Platform::Win64 | Platform::Win32 | Platform::WinArm64 => {
+                    vec![CmdExe.into(), PowerShell::default().into(), Bash.into()]
+                }
+                _ => vec![Bash.into(), Fish.into()],
+            }
+        });
+        create_activation_scripts(&fs::canonicalize(&cli.prefix).await?, shells, cli.platform)
+            .await?;
+    } else {
+        tracing::debug!("Skipping activation script generation as requested");
+    }
 
     tracing::debug!("Finished running pixi-install-to-prefix");
 

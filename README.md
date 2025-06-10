@@ -66,9 +66,32 @@ Options:
   -e, --environment <ENVIRONMENT>  The name of the pixi environment to install [default: default]
   -p, --platform <PLATFORM>        The platform you want to install for [default: osx-arm64]
   -c, --config <CONFIG>            The path to the pixi config file. By default, no config file is used
+  -s, --shell <SHELL>              The shell(s) to generate activation scripts for. Default: see README
+      --no-activation-scripts      Disable the generation of activation scripts
   -v, --verbose...                 Increase logging verbosity
   -q, --quiet...                   Decrease logging verbosity
   -h, --help                       Print help
+```
+
+### ⌨️ Activation Scripts
+
+By default, `pixi-install-to-prefix` will create activation scripts in the `conda-meta/activation` directory of the prefix directory.
+
+Activation scripts are generated for the following shells depending on the target platform:
+
+- Unix: `bash`, `fish`
+- Windows: `cmd`, `powershell`, `bash`
+
+You can override this behaviour by adding `--shell` options to the command:
+
+```bash
+pixi-install-to-prefix --shell bash --shell zsh ./my-environment
+```
+
+To disable activation scripts, you can use the `--no-activation-scripts` option:
+
+```bash
+pixi-install-to-prefix --no-activation-scripts ./my-environment
 ```
 
 ### Mirror and S3 middleware

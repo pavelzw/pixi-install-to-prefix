@@ -1,12 +1,18 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, path::Path, sync::Arc};
 
 use anyhow::{Result, anyhow};
 
+use rattler_conda_types::Platform;
 use rattler_networking::{
     AuthenticationMiddleware, AuthenticationStorage, MirrorMiddleware, S3Middleware,
     mirror_middleware::Mirror,
 };
+use rattler_shell::{
+    activation::{ActivationVariables, Activator, PathModificationBehavior},
+    shell::{Shell, ShellEnum},
+};
 use reqwest_middleware::ClientWithMiddleware;
+use tokio::fs;
 
 /// Create a reqwest client (optionally including authentication middleware).
 pub fn reqwest_client_from_config(
@@ -58,7 +64,10 @@ pub fn reqwest_client_from_config(
         reqwest::Client::builder()
             .no_gzip()
             .pool_max_idle_per_host(20)
-            .user_agent("pixi-pack")
+            .user_agent(format!(
+                "pixi-install-to-prefix/{}",
+                env!("CARGO_PKG_VERSION")
+            ))
             .timeout(std::time::Duration::from_secs(timeout))
             .build()
             .map_err(|e| anyhow!("could not create download client: {}", e))?,
@@ -70,4 +79,39 @@ pub fn reqwest_client_from_config(
     )))
     .build();
     Ok(client)
+}
+
+pub async fn create_activation_scripts(
+    prefix: &Path,
+    shells: Vec<ShellEnum>,
+    platform: Platform,
+) -> Result<()> {
+    for shell in shells {
+        let file_extension = shell.extension();
+        let parent_dir = prefix.join("conda-meta/activation");
+        // Ensure the parent directory exists
+        fs::create_dir_all(&parent_dir)
+            .await
+            .map_err(|e| anyhow!("Could not create activation directory: {}", e))?;
+        let destination = parent_dir.join(format!("activate.{}", file_extension));
+        let activator = Activator::from_path(prefix, shell.clone(), platform)?;
+        let result = activator.activation(ActivationVariables {
+            conda_prefix: None,
+            path: None,
+            path_modification_behavior: PathModificationBehavior::Prepend,
+        })?;
+        let contents = result.script.contents()?;
+
+        fs::write(&destination, contents)
+            .await
+            .map_err(|e| anyhow!("Could not write activate script: {}", e))?;
+
+        tracing::info!(
+            "Activation script for {:?} created at {}",
+            shell,
+            destination.display()
+        );
+    }
+
+    Ok(())
 }
