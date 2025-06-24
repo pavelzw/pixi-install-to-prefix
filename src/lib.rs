@@ -14,14 +14,15 @@ use rattler_shell::{
 use reqwest_middleware::ClientWithMiddleware;
 use tokio::fs;
 
+/// The configuration type for pixi-pack - just extends rattler config and can load the same TOML files as pixi.
+pub type Config = rattler_config::config::ConfigBase<()>;
+
 /// Create a reqwest client (optionally including authentication middleware).
-pub fn reqwest_client_from_config(
-    config: &Option<pixi_config::Config>,
-) -> Result<ClientWithMiddleware> {
+pub fn reqwest_client_from_config(config: &Option<Config>) -> Result<ClientWithMiddleware> {
     let auth_storage = AuthenticationStorage::from_env_and_defaults()?;
 
     let s3_middleware = if let Some(config) = config {
-        let s3_config = config.compute_s3_config();
+        let s3_config = rattler_networking::s3_middleware::compute_s3_config(&config.s3_options.0);
         tracing::info!("Using S3 config: {:?}", s3_config);
         S3Middleware::new(s3_config, auth_storage.clone())
     } else {
@@ -29,7 +30,7 @@ pub fn reqwest_client_from_config(
     };
     let mirror_middleware = if let Some(config) = config {
         let mut internal_map = HashMap::new();
-        tracing::info!("Using mirrors: {:?}", config.mirror_map());
+        tracing::info!("Using mirrors: {:?}", config.mirrors);
 
         fn ensure_trailing_slash(url: &url::Url) -> url::Url {
             if url.path().ends_with('/') {
@@ -41,7 +42,7 @@ pub fn reqwest_client_from_config(
                     .expect("Failed to add trailing slash to URL")
             }
         }
-        for (key, value) in config.mirror_map() {
+        for (key, value) in &config.mirrors {
             let mut mirrors = Vec::new();
             for v in value {
                 mirrors.push(Mirror {

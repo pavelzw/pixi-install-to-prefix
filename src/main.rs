@@ -3,15 +3,14 @@ use std::path::PathBuf;
 use anyhow::{Result, anyhow};
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
-use pixi_config::Config;
-use pixi_install_to_prefix::{create_activation_scripts, reqwest_client_from_config};
+use pixi_install_to_prefix::{Config, create_activation_scripts, reqwest_client_from_config};
 use rattler::install::Installer;
 use rattler_conda_types::{Platform, RepoDataRecord};
 use rattler_lock::{
     CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackageRef, UrlOrPath,
 };
 use rattler_shell::shell::{Bash, CmdExe, Fish, PowerShell, ShellEnum};
-use tokio::fs::{self, OpenOptions, read_to_string};
+use tokio::fs::{self, OpenOptions};
 
 /* -------------------------------------------- CLI -------------------------------------------- */
 
@@ -65,10 +64,8 @@ async fn main() -> Result<()> {
 
     let pixi_config = if let Some(config_path) = cli.config {
         tracing::debug!("Using config file: {}", config_path.display());
-        let config_str = read_to_string(&config_path).await?;
-        let (config, _unused_keys) =
-            Config::from_toml(config_str.as_str(), Some(&config_path.clone()))
-                .map_err(|e| anyhow::anyhow!("Failed to parse config file: {}", e))?;
+        let config = Config::load_from_files(vec![&config_path.clone()])
+            .map_err(|e| anyhow::anyhow!("Failed to parse config file: {}", e))?;
         Some(config)
     } else {
         None
