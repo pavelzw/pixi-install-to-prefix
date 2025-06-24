@@ -32,7 +32,7 @@ rustls-tls = [
 anyhow = "1.0.98"
 clap = { version = "4.5.40", features = ["derive", "string"] }
 clap-verbosity-flag = { version = "3.0.2", features = ["tracing"] }
-rattler = { version = "0.34.1", default-features = false, features = [
+rattler = { version = "0.34.2", default-features = false, features = [
   "indicatif",
 ] }
 rattler_conda_types = "0.35.1"
