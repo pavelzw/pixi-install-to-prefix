@@ -44,7 +44,7 @@ rattler_networking = { version = "0.25.1", default-features = false, features = 
 ] }
 rattler_package_streaming = { version = "0.22.40", default-features = false }
 rattler_shell = "0.23.3"
-reqwest = { version = "0.12.20", default-features = false, features = [
+reqwest = { version = "0.12.21", default-features = false, features = [
   "http2",
   "macos-system-configuration",
 ] }
