@@ -1,7 +1,7 @@
 use core::str;
 use std::path::Path;
 
-use assert_cmd::Command;
+use assert_cmd::{Command, cargo::cargo_bin_cmd};
 use rstest::{fixture, rstest};
 use tempfile::TempDir;
 
@@ -43,8 +43,7 @@ fn test_install(tmpdir: TempDir) {
     let test_dir = Path::new("tests/test-env");
     let target = tmpdir;
 
-    Command::cargo_bin("pixi-install-to-prefix")
-        .unwrap()
+    cargo_bin_cmd!("pixi-install-to-prefix")
         .current_dir(test_dir)
         .arg(target.as_ref())
         .output()
