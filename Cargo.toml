@@ -44,13 +44,13 @@ rattler_networking = { version = "0.25.1", default-features = false, features = 
 ] }
 rattler_package_streaming = { version = "0.22.40", default-features = false }
 rattler_shell = "0.23.3"
-reqwest = { version = "0.12.24", default-features = false, features = [
+reqwest = { version = "0.12.28", default-features = false, features = [
   "http2",
   "macos-system-configuration",
 ] }
 reqwest-middleware = "0.4.2"
 tokio = { version = "1.48.0", features = ["rt-multi-thread"] }
-tracing = "0.1.43"
+tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = [
   "default",
   "env-filter",
@@ -60,4 +60,4 @@ url = "2.5.4"
 [dev-dependencies]
 rstest = "0.26.1"
 assert_cmd = "2.1.1"
-tempfile = "3.23.0"
+tempfile = "3.24.0"
