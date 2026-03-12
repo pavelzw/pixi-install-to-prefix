@@ -29,8 +29,8 @@ rustls-tls = [
 ]
 
 [dependencies]
-anyhow = "1.0.100"
-clap = { version = "4.5.56", features = ["derive", "string"] }
+anyhow = "1.0.102"
+clap = { version = "4.5.60", features = ["derive", "string"] }
 clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
 rattler = { version = "0.34.2", default-features = false, features = [
   "indicatif",
@@ -60,4 +60,4 @@ url = "2.5.4"
 [dev-dependencies]
 rstest = "0.26.1"
 assert_cmd = "2.1.2"
-tempfile = "3.24.0"
+tempfile = "3.26.0"
