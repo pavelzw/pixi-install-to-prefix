@@ -1,6 +1,7 @@
 [project]
 name = "pixi-install-to-prefix"
 channels = ["conda-forge"]
+exclude-newer = "7d"
 platforms = [
   "osx-arm64",
   "osx-64",
