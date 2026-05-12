@@ -7,7 +7,7 @@ use pixi_install_to_prefix::{Config, create_activation_scripts, reqwest_client_f
 use rattler::install::Installer;
 use rattler_conda_types::{Platform, RepoDataRecord};
 use rattler_lock::{
-    CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackageRef, UrlOrPath,
+    CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackage, UrlOrPath,
 };
 use rattler_shell::shell::{Bash, CmdExe, Fish, PowerShell, ShellEnum};
 use tokio::fs::{self, OpenOptions};
@@ -90,7 +90,10 @@ async fn main() -> Result<()> {
             "Environment {} not found in lockfile",
             cli.environment
         ))?;
-    let packages = environment.packages(cli.platform).ok_or(anyhow!(
+    let platform = lockfile
+        .platform(&cli.platform.to_string())
+        .ok_or(anyhow!("platform {} not found in lockfile", cli.platform))?;
+    let packages = environment.packages(platform).ok_or(anyhow!(
         "environment {} does not contain platform {}",
         cli.environment,
         cli.platform
@@ -98,10 +101,10 @@ async fn main() -> Result<()> {
 
     let packages = packages
         .map(|p| match p {
-            LockedPackageRef::Conda(p) => match p {
+            LockedPackage::Conda(p) => match p {
                 CondaPackageData::Binary(p) => Ok(RepoDataRecord {
                     package_record: p.package_record.clone(),
-                    file_name: p.file_name.clone(),
+                    identifier: p.file_name.clone(),
                     url: match p.location.clone() {
                         UrlOrPath::Url(url) => url,
                         UrlOrPath::Path(_) => {
@@ -114,7 +117,7 @@ async fn main() -> Result<()> {
                     Err(anyhow!("Source package {} is not supported", p.location))
                 }
             },
-            LockedPackageRef::Pypi(_, _) => {
+            LockedPackage::Pypi(_) => {
                 Err(anyhow!("Pypi package {} is not supported", p.location()))
             }
         })
