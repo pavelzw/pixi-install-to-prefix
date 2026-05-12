@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "pixi-install-to-prefix"
 channels = ["conda-forge"]
 exclude-newer = "7d"
@@ -18,7 +18,7 @@ build = "cargo build --release"
 test = "cargo test"
 
 [dependencies]
-rust = "==1.86.0"
+rust = "==1.95.0"
 openssl = "3.*"
 pkg-config = "*"
 
