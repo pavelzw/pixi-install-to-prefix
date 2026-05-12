@@ -47,7 +47,6 @@ pub fn reqwest_client_from_config(config: &Option<Config>) -> Result<ClientWithM
             for v in value {
                 mirrors.push(Mirror {
                     url: ensure_trailing_slash(v),
-                    no_jlap: false,
                     no_bz2: false,
                     no_zstd: false,
                     max_failures: None,
@@ -100,6 +99,7 @@ pub async fn create_activation_scripts(
             conda_prefix: None,
             path: None,
             path_modification_behavior: PathModificationBehavior::Prepend,
+            current_env: HashMap::new(),
         })?;
         let contents = result.script.contents()?;
 
