@@ -1,7 +1,7 @@
 [package]
 name = "pixi-install-to-prefix"
 description = "Install pixi environments to an arbitrary prefix"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 
 # See https://doc.rust-lang.org/cargo/reference/profiles.html
@@ -15,40 +15,36 @@ opt-level = "z"
 default = ["native-tls"]
 native-tls = [
   "reqwest/native-tls",
-  "reqwest/native-tls-alpn",
   "rattler/native-tls",
-  "rattler_networking/rustls-tls",
-  "rattler_package_streaming/rustls-tls",
+  "rattler_networking/native-tls",
+  "rattler_package_streaming/native-tls",
 ]
 rustls-tls = [
-  "reqwest/rustls-tls",
-  "reqwest/rustls-tls-native-roots",
-  "rattler/rustls-tls",
-  "rattler_networking/rustls-tls",
-  "rattler_package_streaming/rustls-tls",
+  "reqwest/rustls",
+  "rattler/rustls",
+  "rattler_networking/rustls",
+  "rattler_package_streaming/rustls",
 ]
 
 [dependencies]
 anyhow = "1.0.102"
 clap = { version = "4.6.1", features = ["derive", "string"] }
 clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
-rattler = { version = "0.42.0", default-features = false, features = [
+rattler = { version = "0.43.2", default-features = false, features = [
   "indicatif",
 ] }
-rattler_conda_types = "0.46.1"
-rattler_config = { version = "0.3.12" }
-rattler_lock = "0.30.0"
-rattler_networking = { version = "0.26.12", default-features = false, features = [
+rattler_conda_types = "0.46.4"
+rattler_config = { version = "0.4.1" }
+rattler_lock = "0.30.3"
+rattler_networking = { version = "0.27.2", default-features = false, features = [
   "dirs",
   "rattler_config",
   "s3",
 ] }
-rattler_package_streaming = { version = "0.25.1", default-features = false }
-rattler_shell = "0.26.1"
-reqwest = { version = "0.12.28", default-features = false, features = [
-  "http2",
-] }
-reqwest-middleware = { package = "astral-reqwest-middleware", version = "0.4.2" }
+rattler_package_streaming = { version = "0.26.2", default-features = false }
+rattler_shell = "0.27.2"
+reqwest = { version = "0.13.3", default-features = false, features = ["http2"] }
+reqwest-middleware = { package = "astral-reqwest-middleware", version = "0.5.1" }
 tokio = { version = "1.52.3", features = ["rt-multi-thread"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = [
