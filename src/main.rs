@@ -151,9 +151,13 @@ async fn main() -> Result<()> {
             // Default shells based on the platform
             match cli.platform {
                 Platform::Win64 | Platform::Win32 | Platform::WinArm64 => {
-                    vec![CmdExe.into(), PowerShell::default().into(), Bash.into()]
+                    vec![
+                        CmdExe.into(),
+                        PowerShell::default().into(),
+                        Bash::default().into(),
+                    ]
                 }
-                _ => vec![Bash.into(), Fish.into()],
+                _ => vec![Bash::default().into(), Fish.into()],
             }
         });
         create_activation_scripts(&fs::canonicalize(&cli.prefix).await?, shells, cli.platform)
