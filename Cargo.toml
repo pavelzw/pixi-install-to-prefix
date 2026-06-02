@@ -43,7 +43,7 @@ rattler_networking = { version = "0.27.2", default-features = false, features = 
 ] }
 rattler_package_streaming = { version = "0.26.2", default-features = false }
 rattler_shell = "0.27.2"
-reqwest = { version = "0.13.3", default-features = false, features = ["http2"] }
+reqwest = { version = "0.13.4", default-features = false, features = ["http2"] }
 reqwest-middleware = { package = "astral-reqwest-middleware", version = "0.5.1" }
 tokio = { version = "1.52.3", features = ["rt-multi-thread"] }
 tracing = "0.1.44"
