@@ -15,6 +15,7 @@ use tokio::fs::{self, OpenOptions};
 /* -------------------------------------------- CLI -------------------------------------------- */
 
 #[derive(Parser, Debug)]
+#[command(version)]
 struct Cli {
     /// The path to the prefix where you want to install the environment.
     #[clap()]
