@@ -15,7 +15,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use tokio::fs;
 
 /// The configuration type for pixi-pack - just extends rattler config and can load the same TOML files as pixi.
-pub type Config = rattler_config::config::ConfigBase<()>;
+pub type Config = rattler_config::config::ConfigBase<rattler_config::config::NoExtension>;
 
 /// Create a reqwest client (optionally including authentication middleware).
 pub fn reqwest_client_from_config(config: &Option<Config>) -> Result<ClientWithMiddleware> {
