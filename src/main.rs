@@ -29,9 +29,10 @@ struct Cli {
     #[arg(short, long, default_value = DEFAULT_ENVIRONMENT_NAME)]
     environment: String,
 
-    /// The platform you want to install for.
+    /// The platform you want to install for: a conda subdir (e.g. `linux-64`)
+    /// or a platform name from the lockfile (e.g. `jetson`).
     #[arg(short, long, default_value = Platform::current().to_string())]
-    platform: Platform,
+    platform: String,
 
     /// The path to the pixi config file. By default, no config file is used.
     #[arg(short, long)]
@@ -52,6 +53,62 @@ struct Cli {
 /* -------------------------------------------- MAIN ------------------------------------------- */
 
 const CONDA_HISTORY_FILE: &str = "conda-meta/history";
+
+/// Find the requested platform in the locked environment.
+/// A platform name from the lockfile like `jetson` wins over a conda subdir,
+/// a plain subdir like `linux-aarch64` only works when a single named
+/// platform uses it.
+fn find_platform<'lock>(
+    environment: &rattler_lock::Environment<'lock>,
+    requested: &str,
+) -> Result<rattler_lock::Platform<'lock>> {
+    if let Some(platform) = environment
+        .platforms()
+        .find(|p| p.name().as_str() == requested)
+    {
+        return Ok(platform);
+    }
+
+    let subdir_matches: Vec<_> = environment
+        .platforms()
+        .filter(|p| p.subdir().as_str() == requested)
+        .collect();
+    match subdir_matches.as_slice() {
+        [platform] => Ok(*platform),
+        [] => Err(anyhow!(
+            "platform not found in lockfile: {}\nValid values for --platform: {}",
+            requested,
+            platform_choices(environment)
+        )),
+        multiple => {
+            let mut names: Vec<_> = multiple.iter().map(|p| p.name().as_str()).collect();
+            names.sort_unstable();
+            Err(anyhow!(
+                "platform {} is ambiguous, use one of the platform names from the lockfile instead: {}\nValid values for --platform: {}",
+                requested,
+                names.join(", "),
+                platform_choices(environment)
+            ))
+        }
+    }
+}
+
+fn platform_choices(environment: &rattler_lock::Environment<'_>) -> String {
+    let mut choices: Vec<_> = environment
+        .platforms()
+        .map(|platform| {
+            let name = platform.name().as_str();
+            let subdir = platform.subdir().as_str();
+            if name == subdir {
+                name.to_string()
+            } else {
+                format!("{} ({})", name, subdir)
+            }
+        })
+        .collect();
+    choices.sort_unstable();
+    choices.join(", ")
+}
 
 /// The main entrypoint for the pixi-install-to-prefix CLI.
 #[tokio::main]
@@ -91,9 +148,10 @@ async fn main() -> Result<()> {
             "Environment {} not found in lockfile",
             cli.environment
         ))?;
-    let platform = lockfile
-        .platform(&cli.platform.to_string())
-        .ok_or(anyhow!("platform {} not found in lockfile", cli.platform))?;
+    let platform = find_platform(&environment, &cli.platform)?;
+    // A named platform can point at any conda subdir, so resolve it before
+    // installing.
+    let subdir = platform.subdir();
     let packages = environment.packages(platform).ok_or(anyhow!(
         "environment {} does not contain platform {}",
         cli.environment,
@@ -126,7 +184,7 @@ async fn main() -> Result<()> {
 
     let result = Installer::new()
         .with_download_client(download_client)
-        .with_target_platform(cli.platform)
+        .with_target_platform(subdir)
         .with_execute_link_scripts(true)
         .with_reporter(rattler::install::IndicatifReporter::builder().finish())
         .install(&cli.prefix, packages)
@@ -150,7 +208,7 @@ async fn main() -> Result<()> {
     if !cli.no_activation_scripts {
         let shells = cli.shell.unwrap_or_else(|| {
             // Default shells based on the platform
-            match cli.platform {
+            match subdir {
                 Platform::Win64 | Platform::Win32 | Platform::WinArm64 => {
                     vec![
                         CmdExe.into(),
@@ -161,8 +219,7 @@ async fn main() -> Result<()> {
                 _ => vec![Bash::default().into(), Fish.into()],
             }
         });
-        create_activation_scripts(&fs::canonicalize(&cli.prefix).await?, shells, cli.platform)
-            .await?;
+        create_activation_scripts(&fs::canonicalize(&cli.prefix).await?, shells, subdir).await?;
     } else {
         tracing::debug!("Skipping activation script generation as requested");
     }

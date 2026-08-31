@@ -64,7 +64,7 @@ Arguments:
 Options:
   -l, --lockfile <LOCKFILE>        The path to the pixi lockfile [default: pixi.lock]
   -e, --environment <ENVIRONMENT>  The name of the pixi environment to install [default: default]
-  -p, --platform <PLATFORM>        The platform you want to install for [default: osx-arm64]
+  -p, --platform <PLATFORM>        The platform you want to install for: a conda subdir (e.g. `linux-64`) or a platform name from the lockfile (e.g. `jetson`) [default: osx-arm64]
   -c, --config <CONFIG>            The path to the pixi config file. By default, no config file is used
   -s, --shell <SHELL>              The shell(s) to generate activation scripts for. Default: see README
       --no-activation-scripts      Disable the generation of activation scripts
@@ -72,6 +72,20 @@ Options:
   -q, --quiet...                   Decrease logging verbosity
   -h, --help                       Print help
 ```
+
+### 🏷️ Named platforms
+
+If your `pixi.toml` defines named platforms (requires a lockfile in version 7 or later), you can install them by name.
+
+```toml
+platforms = [{ name = "jetson", platform = "linux-aarch64", cuda = "13" }]
+```
+
+```bash
+pixi-install-to-prefix --platform jetson ./my-environment
+```
+
+You can still pass the underlying conda platform (e.g. `linux-aarch64`) as long as only one named platform uses it; otherwise `pixi-install-to-prefix` asks you to use one of the platform names instead.
 
 ### ⌨️ Activation Scripts
 
