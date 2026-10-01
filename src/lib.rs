@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::Path, sync::Arc};
 
 use anyhow::{Result, anyhow};
 
-use rattler_conda_types::Platform;
+use rattler_conda_types::Subdir;
 use rattler_networking::{
     AuthenticationMiddleware, AuthenticationStorage, MirrorMiddleware, S3Middleware,
     mirror_middleware::Mirror,
@@ -84,7 +84,7 @@ pub fn reqwest_client_from_config(config: &Option<Config>) -> Result<ClientWithM
 pub async fn create_activation_scripts(
     prefix: &Path,
     shells: Vec<ShellEnum>,
-    platform: Platform,
+    platform: Subdir,
 ) -> Result<()> {
     for shell in shells {
         let file_extension = shell.extension();

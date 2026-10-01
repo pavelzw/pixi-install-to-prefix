@@ -28,22 +28,22 @@ rustls = [
 
 [dependencies]
 anyhow = "1.0.104"
-clap = { version = "4.6.6", features = ["derive", "string"] }
+clap = { version = "4.6.7", features = ["derive", "string"] }
 clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
-rattler = { version = "0.48.6", default-features = false, features = [
+rattler = { version = "0.51.0", default-features = false, features = [
   "indicatif",
 ] }
-rattler_conda_types = "0.53.0"
-rattler_config = { version = "0.7.4" }
-rattler_lock = "0.33.0"
-rattler_networking = { version = "0.30.8", default-features = false, features = [
+rattler_conda_types = "0.55.0"
+rattler_config = { version = "0.8.0" }
+rattler_lock = "0.34.0"
+rattler_networking = { version = "0.31.0", default-features = false, features = [
   "dirs",
   "rattler_config",
   "s3",
 ] }
-rattler_package_streaming = { version = "0.27.4", default-features = false }
-rattler_shell = "0.28.0"
-reqwest = { version = "0.13.4", default-features = false, features = ["http2"] }
+rattler_package_streaming = { version = "0.27.8", default-features = false }
+rattler_shell = "0.29.0"
+reqwest = { version = "0.13.5", default-features = false, features = ["http2"] }
 reqwest-middleware = { package = "astral-reqwest-middleware", version = "0.5.1" }
 tokio = { version = "1.53.1", features = ["rt-multi-thread"] }
 tracing = "0.1.44"

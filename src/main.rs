@@ -5,7 +5,7 @@ use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 use pixi_install_to_prefix::{Config, create_activation_scripts, reqwest_client_from_config};
 use rattler::install::Installer;
-use rattler_conda_types::{Platform, RepoDataRecord};
+use rattler_conda_types::{RepoDataRecord, Subdir};
 use rattler_lock::{
     CondaPackageData, DEFAULT_ENVIRONMENT_NAME, LockFile, LockedPackage, UrlOrPath,
 };
@@ -31,8 +31,9 @@ struct Cli {
 
     /// The platform you want to install for: a conda subdir (e.g. `linux-64`)
     /// or a platform name from the lockfile (e.g. `jetson`).
-    #[arg(short, long, default_value = Platform::current().to_string())]
-    platform: String,
+    /// Defaults to the subdir of the current machine.
+    #[arg(short, long)]
+    platform: Option<String>,
 
     /// The path to the pixi config file. By default, no config file is used.
     #[arg(short, long)]
@@ -148,14 +149,22 @@ async fn main() -> Result<()> {
             "Environment {} not found in lockfile",
             cli.environment
         ))?;
-    let platform = find_platform(&environment, &cli.platform)?;
+    let requested_platform = match cli.platform {
+        Some(platform) => platform,
+        None => Subdir::current()
+            .ok_or(anyhow!(
+                "could not determine the current platform, please specify --platform"
+            ))?
+            .to_string(),
+    };
+    let platform = find_platform(&environment, &requested_platform)?;
     // A named platform can point at any conda subdir, so resolve it before
     // installing.
     let subdir = platform.subdir();
     let packages = environment.packages(platform).ok_or(anyhow!(
         "environment {} does not contain platform {}",
         cli.environment,
-        cli.platform
+        requested_platform
     ))?;
 
     let packages = packages
@@ -208,15 +217,14 @@ async fn main() -> Result<()> {
     if !cli.no_activation_scripts {
         let shells = cli.shell.unwrap_or_else(|| {
             // Default shells based on the platform
-            match subdir {
-                Platform::Win64 | Platform::Win32 | Platform::WinArm64 => {
-                    vec![
-                        CmdExe.into(),
-                        PowerShell::default().into(),
-                        Bash::default().into(),
-                    ]
-                }
-                _ => vec![Bash::default().into(), Fish.into()],
+            if subdir.is_windows() {
+                vec![
+                    CmdExe.into(),
+                    PowerShell::default().into(),
+                    Bash::default().into(),
+                ]
+            } else {
+                vec![Bash::default().into(), Fish.into()]
             }
         });
         create_activation_scripts(&fs::canonicalize(&cli.prefix).await?, shells, subdir).await?;
