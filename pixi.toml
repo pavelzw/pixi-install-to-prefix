@@ -18,7 +18,7 @@ build = "cargo build --release"
 test = "cargo test"
 
 [dependencies]
-rust = "==1.95.0"
+rust = "==1.98.1"
 openssl = "3.*"
 pkg-config = "*"
 
