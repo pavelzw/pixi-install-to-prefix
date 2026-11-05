@@ -33,7 +33,7 @@ clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
 rattler = { version = "0.51.0", default-features = false, features = [
   "indicatif",
 ] }
-rattler_conda_types = "0.55.0"
+rattler_conda_types = "0.56.0"
 rattler_config = { version = "0.8.0" }
 rattler_lock = "0.34.0"
 rattler_networking = { version = "0.31.0", default-features = false, features = [
@@ -54,6 +54,6 @@ tracing-subscriber = { version = "0.3.23", features = [
 url = "2.5.8"
 
 [dev-dependencies]
-rstest = "0.27.0"
+rstest = "0.28.0"
 assert_cmd = "2.2.2"
 tempfile = "3.27.0"
